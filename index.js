@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
+import { toNodeHandler } from "better-auth/node";
+import { createAuth } from "./auth.js";
 
 
 dotenv.config();
@@ -15,8 +17,6 @@ app.use(
     credentials: true,
   })
 );
-
-app.use(express.json());
 
 app.get("/", (req, res) => {
   res.send("TogetherServe server is running");
@@ -32,7 +32,15 @@ const startServer = async () => {
 
     console.log(`MongoDB connected: ${db.databaseName}`);
 
-    
+    // Set up BetterAuth using our database connection.
+    const auth = createAuth(db, client);
+
+    // BetterAuth handles registration, login, and sessions.
+    app.all("/api/auth/*splat", toNodeHandler(auth));
+
+    // Keep this after the BetterAuth route.
+    app.use(express.json());
+
     app.listen(port, () => {
       console.log(`Server is running on http://localhost:${port}`);
     });
