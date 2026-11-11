@@ -1,6 +1,8 @@
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { createAuthMiddleware, APIError } from "better-auth/api";
+import { jwt } from "better-auth/plugins";
+
 
 export const createAuth = (db, client) => {
     return betterAuth({
@@ -27,7 +29,8 @@ export const createAuth = (db, client) => {
             },
         },
 
-        
+        plugins: [jwt()],
+
         hooks: {
             before: createAuthMiddleware(async (context) => {
 
