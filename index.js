@@ -32,13 +32,13 @@ const startServer = async () => {
 
     console.log(`MongoDB connected: ${db.databaseName}`);
 
-    // Set up BetterAuth using our database connection.
+    
     const auth = createAuth(db, client);
 
-    // BetterAuth handles registration, login, and sessions.
+    
     app.all("/api/auth/*splat", toNodeHandler(auth));
 
-    // Keep this after the BetterAuth route.
+    
     app.use(express.json());
 
     app.listen(port, () => {
