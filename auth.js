@@ -3,56 +3,64 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { createAuthMiddleware, APIError } from "better-auth/api";
 
 export const createAuth = (db, client) => {
-  return betterAuth({
-    appName: "TogetherServe",
+    return betterAuth({
+        appName: "TogetherServe",
 
-    baseURL: process.env.BETTER_AUTH_URL,
+        baseURL: process.env.BETTER_AUTH_URL,
 
-    secret: process.env.BETTER_AUTH_SECRET,
+        secret: process.env.BETTER_AUTH_SECRET,
 
-    database: mongodbAdapter(db, { client }),
+        database: mongodbAdapter(db, { client }),
 
-    trustedOrigins: [process.env.CLIENT_URL],
+        trustedOrigins: [process.env.CLIENT_URL],
 
-    emailAndPassword: {
-      enabled: true,
-      minPasswordLength: 6,
-      requireEmailVerification: false,
-    },
+        emailAndPassword: {
+            enabled: true,
+            minPasswordLength: 6,
+            requireEmailVerification: false,
+        },
 
-    hooks: {
-      before: createAuthMiddleware(async (context) => {
+        socialProviders: {
+            google: {
+                clientId: process.env.GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            },
+        },
+
         
-        if (context.path !== "/sign-up/email") {
-          return;
-        }
+        hooks: {
+            before: createAuthMiddleware(async (context) => {
 
-        const password = context.body?.password;
+                if (context.path !== "/sign-up/email") {
+                    return;
+                }
 
-        if (typeof password !== "string") {
-          throw new APIError("BAD_REQUEST", {
-            message: "Please enter a password.",
-          });
-        }
+                const password = context.body?.password;
 
-        if (password.length < 6) {
-          throw new APIError("BAD_REQUEST", {
-            message: "Password must have at least 6 characters.",
-          });
-        }
+                if (typeof password !== "string") {
+                    throw new APIError("BAD_REQUEST", {
+                        message: "Please enter a password.",
+                    });
+                }
 
-        if (!/[A-Z]/.test(password)) {
-          throw new APIError("BAD_REQUEST", {
-            message: "Password must contain an uppercase letter.",
-          });
-        }
+                if (password.length < 6) {
+                    throw new APIError("BAD_REQUEST", {
+                        message: "Password must have at least 6 characters.",
+                    });
+                }
 
-        if (!/[a-z]/.test(password)) {
-          throw new APIError("BAD_REQUEST", {
-            message: "Password must contain a lowercase letter.",
-          });
-        }
-      }),
-    },
-  });
+                if (!/[A-Z]/.test(password)) {
+                    throw new APIError("BAD_REQUEST", {
+                        message: "Password must contain an uppercase letter.",
+                    });
+                }
+
+                if (!/[a-z]/.test(password)) {
+                    throw new APIError("BAD_REQUEST", {
+                        message: "Password must contain a lowercase letter.",
+                    });
+                }
+            }),
+        },
+    });
 };
