@@ -7,6 +7,7 @@ import { createAuth } from "./auth.js";
 import { verifyJWT } from "./verifyJWT.js";
 import { validateEvent } from "./validateEvent.js";
 import { addJoinRoutes } from "./joinRoutes.js";
+import { addManageEventRoutes } from "./manageEventRoutes.js";
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ const startServer = async () => {
 
         await addJoinRoutes(app, db);
 
+        addManageEventRoutes(app, db);
 
 
         app.get("/api/private-test", verifyJWT, (req, res) => {
