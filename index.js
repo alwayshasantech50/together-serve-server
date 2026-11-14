@@ -6,6 +6,7 @@ import { toNodeHandler } from "better-auth/node";
 import { createAuth } from "./auth.js";
 import { verifyJWT } from "./verifyJWT.js";
 import { validateEvent } from "./validateEvent.js";
+import { addJoinRoutes } from "./joinRoutes.js";
 
 dotenv.config();
 
@@ -39,6 +40,8 @@ const startServer = async () => {
         app.all("/api/auth/*splat", toNodeHandler(auth));
 
         app.use(express.json());
+
+        await addJoinRoutes(app, db);
 
 
 
